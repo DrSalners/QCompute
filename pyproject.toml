@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "qcompute"
+version = "0.1.0"
+description = ""
+authors = ["DrSalners <134757896+DrSalners@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+numpy = "^2.0.1"
+matplotlib = "^3.9.1"
+scipy = "^1.14.0"
+qiskit = "^1.1.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
