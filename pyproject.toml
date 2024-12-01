@@ -13,6 +13,7 @@ scipy = "^1.14.0"
 qiskit = "^1.1.1"
 graphviz = "^0.20.3"
 qiskit-aer = "^0.15.1"
+tensornetwork = "^0.4.6"
 
 
 [tool.poetry.group.dev.dependencies]
