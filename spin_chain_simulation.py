@@ -8,7 +8,7 @@ import time as tm
 dt=2.5
 n=100
 time=np.arange(0,dt,dt/n)
-numqubits=[3]
+numqubits=[3,4,5,6,7]
 Jx=-0.8
 Jy=-0.2
 Jz=0

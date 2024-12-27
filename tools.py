@@ -81,10 +81,15 @@ def matrix_multiply(mat1: list[list],
     if len(mat1[0])!=len(mat2):
         ValueError('len of mat1 column n.e. to len of mat2 row')
 
-    mat=[[0 for i in range(len(mat1[0]))] for j in range(len(mat1[0]))]
-    for i in range(len(mat1[0])):
-        for j in range(len(mat1[0])):
-            for k,l in zip(range(len(mat1[0])),range(len(mat1[0]))):
+    a=len(mat1)
+    b=len(mat2)
+    c=len(mat2[0])
+
+    mat=[[0 for i in range(c)] for j in range(a)]
+
+    for i in range(a):
+        for j in range(c):
+            for k,l in zip(range(b),range(b)):
                 mat[i][j]+=mat1[i][k]*mat2[l][j]
     return mat
 
@@ -177,7 +182,6 @@ def Heis_Ham_1D_Propogator(n_qubit: int,
     """
     # define parameters
     deltat=time/n
-    print(deltat)
     # construct Cx,H,Y,Ydag and Rz
     Cx=controlled_op(1,2,2,'Px').generate_matrix()
     H=string_operator(['H','H']).generate_matrix()
@@ -378,3 +382,59 @@ class controlled_op():
         mat2=string_operator(op_string[::-1]).generate_matrix()
 
         return matrix_add(mat1,mat2)
+    
+
+# TENSOR PRODUCT TOOLS
+def reshape_r1_to_rn(psi):
+    n=int(np.log(2)*np.log(len(psi)))
+    l=int(len(psi))
+    while l>=2.0:
+        l=int(l/2.0)
+        psi=[[psi[i],psi[i+1]] for i in [2*j for j in range(l)]]
+   
+    return psi[0]
+
+# def int_to_binary(num,n):
+#     vec=[]
+#     for i in range(n-1):
+#         vec.append()
+#     return vec
+
+def reshape_rn_to_mat(psi,n):
+    psi_new=[]
+    for i in range(2):
+        vec=[]
+        for j in range(2**(n-1)):
+            binary=("{0:0"+str(n-1)+"b}").format(j)
+            temp=psi[i].copy()
+            for k in range(n-1):
+                temp=temp[int(binary[k])]
+            vec.append(temp) 
+        psi_new.append(vec)
+    return psi_new
+
+# def svd():
+#     return U, Lambda, Vd
+
+def reshape_mat(psi,left,right):
+    psi_new=[[0 for i in range(2**right)] for j in range(2**left)]
+    count=0
+    for i in range(2**left):
+        for j in range(len(psi[0])):
+            if count>=2**left:
+                break
+
+            psi_new[count][np.mod(j,2**right)]= psi[np.mod(i,left)][j]
+            if np.mod(j,2**right)==right:
+                count+=1
+
+    return psi_new
+
+def reshape_r2_to_rn(psi):
+    n=int(np.log(2)*np.log(len(psi)))
+    l=int(len(psi))
+    while l>=2.0:
+        l=int(l/2.0)
+        psi=[[psi[i],psi[i+1]] for i in [2*j for j in range(l)]]
+   
+    return psi[0]
