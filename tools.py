@@ -413,8 +413,10 @@ def reshape_rn_to_mat(psi,n):
         psi_new.append(vec)
     return psi_new
 
-# def svd():
-#     return U, Lambda, Vd
+def svd(psi):
+    U, Lambda, Vd = np.linalg.svd(psi,full_matrices=False)
+    return U.tolist(), np.diag(Lambda).tolist(), Vd.tolist()
+
 
 def reshape_mat(psi,left,right):
     psi_new=[[0 for i in range(2**right)] for j in range(2**left)]
@@ -430,7 +432,7 @@ def reshape_mat(psi,left,right):
 
     return psi_new
 
-def reshape_r2_to_rn(psi):
+def reshape_r2_to_rn(psi,bonds):
     n=int(np.log(2)*np.log(len(psi)))
     l=int(len(psi))
     while l>=2.0:
@@ -438,3 +440,41 @@ def reshape_r2_to_rn(psi):
         psi=[[psi[i],psi[i+1]] for i in [2*j for j in range(l)]]
    
     return psi[0]
+
+def reshape_vd(psi,bonds):
+    n=int(np.log(2)*np.log(len(psi)))
+    l=int(len(psi))
+    while l>=2.0:
+        l=int(l/2.0)
+        psi=[[psi[i],psi[i+1]] for i in [2*j for j in range(l)]]
+   
+    return psi[0]
+
+def mps(psi,n):
+    mps=[]
+    chi=2**(int(n/2))
+    print(chi)
+    p_reshape=reshape_r1_to_rn(psi)
+    p_reshape=reshape_rn_to_mat(p_reshape,n)
+    U, Lambda, Vd=svd(np.asarray(p_reshape))
+    bonds=len(Lambda)
+    psi_remainder=matrix_multiply(np.diag(np.asarray(Lambda)).tolist(),Vd)
+    print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+    print('2a',np.diag(np.asarray(Lambda)))
+    Vd=reshape_mat(psi_remainder,2**(n-1),2*bonds)
+    Vd=Vd[:chi]
+    bondl=len(Vd[0])
+    print('2b',np.asarray(Vd))
+
+    print('2c',np.asarray(psi_remainder))
+    mps.append([U])
+
+    for i in np.arange(n-2,-1,-1):
+        U, Lambda, Vd=svd(np.asarray(reshape_mat(psi_remainder,left=2,right=i)))
+        if i!=0:
+            mps.append(reshape_r1_to_rn(U))
+        else:
+            mps.append(np.asarray(reshape_r1_to_rn(U)))
+        psi_remainder=matrix_multiply(Lambda,Vd)
+
+    return mps
